@@ -55,17 +55,37 @@
     </div>
 
     <h2 class="mt-5">Resultados da Busca:</h2>
-    <div v-if="isLoading" class="col-md-4 d-flex align-items-center justify-content-center">
+    <div
+      v-if="isLoading"
+      class="col-md-4 d-flex align-items-center justify-content-center"
+    >
       <div class="card">
         <div class="card-body text-center">
-          <div class="spinner-border" role="status">
-          </div>
+          <div class="spinner-border" role="status"></div>
         </div>
       </div>
-    </div> 
-    <div class="row mt-3">    
-      <div class="col-md-4 mt-3" v-for="artwork in artworks" :key="artwork.objectID">
+    </div>
+    <div class="row mt-3">
+      <div
+        class="col-md-4 mt-3"
+        v-for="artwork in artworks"
+        :key="artwork.objectID"
+      >
         <div class="card">
+          <div v-if="artwork.primaryImage">
+            <img
+              :src="artwork.primaryImage"
+              :alt="artwork.title"
+              class="card-img-top"
+            />
+          </div>
+          <div v-else class="no-image-available">Sem imagem disponível</div>
+          <button
+          class="btn btn-primary m-2"
+          @click="toggleFavorite(artwork)"
+        >
+          {{ isFavorite(artwork) ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}
+        </button>
           <div class="card-body">
             <h5 class="card-title">{{ artwork.title }}</h5>
             <p class="card-text">
@@ -92,6 +112,7 @@ export default {
   props: {
     msg: String,
   },
+  
 
   data() {
     return {
@@ -100,11 +121,42 @@ export default {
       searchTitle: "",
       artworks: [],
       selectedArtwork: null,
-      isLoading: false
+      isLoading: false,
+      favoriteArtworks: [],
     };
   },
-
+  mounted() {
+  this.loadFavorites();
+},
+// Adicione o atributo de dados computados favoriteArtworks
   methods: {
+    toggleFavorite(artwork) {
+    if (this.isFavorite(artwork)) {
+      this.removeFavorite(artwork);
+    } else {
+      this.addFavorite(artwork);
+    }
+  },
+  isFavorite(artwork) {
+    return this.favoriteArtworks.some((favorite) => favorite.objectID === artwork.objectID);
+  },
+  addFavorite(artwork) {
+    this.favoriteArtworks.push(artwork);
+    this.saveFavorites();
+  },
+  removeFavorite(artwork) {
+    this.favoriteArtworks = this.favoriteArtworks.filter((favorite) => favorite.objectID !== artwork.objectID);
+    this.saveFavorites();
+  },
+  saveFavorites() {
+    localStorage.setItem('favoriteArtworks', JSON.stringify(this.favoriteArtworks));
+  },
+  loadFavorites() {
+    const storedFavorites = localStorage.getItem('favoriteArtworks');
+    if (storedFavorites) {
+      this.favoriteArtworks = JSON.parse(storedFavorites);
+    }
+  },
     async searchByArtist() {
       this.artworks = await axios({
         url: `collection/v1/search`,
@@ -174,9 +226,10 @@ export default {
         })
         .catch((error) => {
           console.log(error);
-        }).finally(() => {
-      this.isLoading = false; // Reseta isLoading após a conclusão da requisição
-    });
+        })
+        .finally(() => {
+          this.isLoading = false; // Reseta isLoading após a conclusão da requisição
+        });
     },
   },
 };
@@ -197,5 +250,12 @@ li {
 }
 a {
   color: #42b983;
+}
+.no-image-available {
+  text-align: center;
+  padding: 10px;
+  background-color: #f2f2f2;
+  color: #555;
+  font-style: italic;
 }
 </style>
