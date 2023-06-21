@@ -53,7 +53,6 @@
         </div>
       </div>
     </div>
-
     <h2 class="mt-5">Resultados da Busca:</h2>
     <div
       v-if="isLoading"
@@ -82,6 +81,7 @@
           <div v-else class="no-image-available">Sem imagem disponível</div>
           <button
           class="btn btn-primary m-2"
+          :class="{ 'btn-primary': !isFavorite(artwork), 'btn-danger': isFavorite(artwork) }"
           @click="toggleFavorite(artwork)"
         >
           {{ isFavorite(artwork) ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}
@@ -97,6 +97,9 @@
             <p class="card-text">
               <strong>Descrição:</strong> {{ artwork.objectName }}
             </p>
+            <p :class="{'text-success': artwork.isPublicDomain, 'text-danger': !artwork.isPublicDomain}" class="card-text">
+              <strong>Domínio Público:</strong> {{ artwork.isPublicDomain ? 'Sim' : 'Não' }}
+            </p>
           </div>
         </div>
       </div>
@@ -105,10 +108,10 @@
 </template>
 
 <script>
-import axios from "axios";
+import { searchArtworksByArtist, searchArtworksByLocation, searchArtworksByTitle } from '@/api.js';
 
 export default {
-  name: "HelloWorld",
+  name: "searchComponent",
   props: {
     msg: String,
   },
@@ -127,8 +130,7 @@ export default {
   },
   mounted() {
   this.loadFavorites();
-},
-// Adicione o atributo de dados computados favoriteArtworks
+},  
   methods: {
     toggleFavorite(artwork) {
     if (this.isFavorite(artwork)) {
@@ -157,79 +159,20 @@ export default {
       this.favoriteArtworks = JSON.parse(storedFavorites);
     }
   },
-    async searchByArtist() {
-      this.artworks = await axios({
-        url: `collection/v1/search`,
-        method: "GET",
-        params: {
-          artistOrCulture: true,
-          q: this.searchArtist,
-        },
-      })
-        .then((response) => {
-          const objectIDs = response.data.objectIDs;
-          this.fetchArtworksDetails(objectIDs);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+  async searchByArtist() {
+      this.isLoading = true;
+      this.artworks = await searchArtworksByArtist(this.searchArtist);
+      this.isLoading = false;
     },
     async searchByLocation() {
-      this.artworks = await axios({
-        url: `collection/v1/search`,
-        method: "GET",
-        params: {
-          geoLocation: true,
-          q: this.searchLocation,
-        },
-      })
-        .then((response) => {
-          const objectIDs = response.data.objectIDs;
-          this.fetchArtworksDetails(objectIDs);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      this.isLoading = true;
+      this.artworks = await searchArtworksByLocation(this.searchLocation);
+      this.isLoading = false;
     },
     async searchByTitle() {
-      this.artworks = await axios({
-        url: `collection/v1/search`,
-        method: "GET",
-        params: {
-          title: true,
-          q: this.searchTitle,
-        },
-      })
-        .then((response) => {
-          const objectIDs = response.data.objectIDs;
-          this.fetchArtworksDetails(objectIDs);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    fetchArtworksDetails(objectIDs) {
       this.isLoading = true;
-      const promises = objectIDs.map((objectID) => {
-        return `https://collectionapi.metmuseum.org/public/collection/v1/objects/${objectID}`;
-      });
-      Promise.allSettled(promises.map((endpoint) => axios.get(endpoint)))
-        .then((responses) => {
-          const artworks = [];
-          responses.forEach((response) => {
-            if (response.value?.data) {
-              artworks.push(response.value?.data);
-            }
-          });
-          this.artworks = artworks;
-          console.log(artworks);
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false; // Reseta isLoading após a conclusão da requisição
-        });
+      this.artworks = await searchArtworksByTitle(this.searchTitle);
+      this.isLoading = false;
     },
   },
 };
