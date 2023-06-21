@@ -10,6 +10,7 @@
             <div class="form-group">
               <label for="artist">Artista:</label>
               <input
+                @keyup.enter="searchByArtist()"
                 type="text"
                 id="artist"
                 class="form-control"
@@ -46,6 +47,7 @@
             <div class="form-group">
               <label for="title">Título:</label>
               <input
+                @keyup.enter="searchByTitle()"
                 type="text"
                 id="title"
                 class="form-control"
@@ -81,14 +83,14 @@
           :key="artwork.objectID"
         >
           <div class="card card-size">
-            <div v-if="artwork.primaryImage">
+            <div v-if="artwork.primaryImageSmall">
               <img
-                :src="artwork.primaryImage"
+                v-lazy="artwork.primaryImageSmall"
                 :alt="artwork.title"
                 class="card-img-top image"
               />
             </div>
-            <div v-else class="no-image-available">Sem imagem disponível</div>
+            <div v-else class="no-image-available"><p>Sem imagem disponível</p></div>
             <button
               class="btn btn-primary m-2"
               :class="{
@@ -260,11 +262,14 @@ a {
   color: #42b983;
 }
 .no-image-available {
-  text-align: center;
-  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #f2f2f2;
-  color: #555;
+  color: #413333;
   font-style: italic;
+  width: 100%;
+  height: 300px;
 }
 .search-container {
   background-image: url("../assets/artwork-background.jpg");

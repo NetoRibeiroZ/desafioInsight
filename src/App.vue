@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <searchComponent/>
+    <footer class="m-3"> © Neto Rodrigues</footer>
   </div>
+
 </template>
 
 <script>
@@ -23,5 +25,13 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+
+
 }
 </style>
