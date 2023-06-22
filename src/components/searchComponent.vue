@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="search-container">
-      <h1 class="mt-5">Busca de Obras de Arte</h1>
-
+      <h1 class="mt-5">ArtFinder</h1>
+      <h4 class="mt-5">Seu local para pesquisa de obras de arte</h4>
       <div class="mt-5">
         <div class="row">
           <div class="col-md-4">
@@ -10,6 +10,7 @@
             <div class="form-group">
               <label for="artist">Artista:</label>
               <input
+                placeholder="Busque obras por nome de artistas"
                 @keyup.enter="searchByArtist()"
                 type="text"
                 id="artist"
@@ -47,6 +48,7 @@
             <div class="form-group">
               <label for="title">Título:</label>
               <input
+                placeholder="Busque obras artisticas por título"
                 @keyup.enter="searchByTitle()"
                 type="text"
                 id="title"
@@ -111,7 +113,9 @@
               <h5 v-if="artwork.title" class="card-title">
                 <strong>Título:</strong> {{ artwork.title }}
               </h5>
-              <h5 v-else class="card-title"><strong>Título:</strong> Sem informações</h5>
+              <h5 v-else class="card-title">
+                <strong>Título:</strong> Sem informações
+              </h5>
               <p v-if="artwork.artistDisplayName" class="card-text">
                 <strong>Artista:</strong> {{ artwork.artistDisplayName }}
               </p>
@@ -292,6 +296,7 @@ a {
 }
 h1,
 h2,
+h4,
 label {
   color: white;
 }
