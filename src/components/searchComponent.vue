@@ -90,7 +90,9 @@
                 class="card-img-top image"
               />
             </div>
-            <div v-else class="no-image-available"><p>Sem imagem disponível</p></div>
+            <div v-else class="no-image-available">
+              <p>Sem imagem disponível</p>
+            </div>
             <button
               class="btn btn-primary m-2"
               :class="{
@@ -106,15 +108,27 @@
               }}
             </button>
             <div class="card-body">
-              <h5 class="card-title">{{ artwork.title }}</h5>
-              <p class="card-text">
+              <h5 v-if="artwork.title" class="card-title">
+                <strong>Título:</strong> {{ artwork.title }}
+              </h5>
+              <h5 v-else class="card-title"><strong>Título:</strong> Sem informações</h5>
+              <p v-if="artwork.artistDisplayName" class="card-text">
                 <strong>Artista:</strong> {{ artwork.artistDisplayName }}
               </p>
-              <p class="card-text">
+              <p v-else class="card-text">
+                <strong>Artista:</strong> Sem informações
+              </p>
+              <p v-if="artwork.repository" class="card-text">
                 <strong>Localização:</strong> {{ artwork.repository }}
               </p>
-              <p class="card-text">
+              <p v-else class="card-text">
+                <strong>Localização:</strong> Sem informações
+              </p>
+              <p v-if="artwork.objectName" class="card-text">
                 <strong>Descrição:</strong> {{ artwork.objectName }}
+              </p>
+              <p v-else class="card-text">
+                <strong>Descrição:</strong> Sem informações
               </p>
               <p
                 :class="{
